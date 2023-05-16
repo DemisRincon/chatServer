@@ -1,12 +1,6 @@
 {
-  "name": "marck-server",
-  "version": "0.0.0",
-  "engines": {
-    "node": ">=18.16.0"
-  },
-  "private": true,
   "scripts": {
-    "start": "node server.js"
+    "dev": "node server.js"
   },
   "dependencies": {
     "axios": "^1.4.0",

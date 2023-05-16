@@ -1,25 +1,21 @@
 require('dotenv').config();
-console.log(process.env.HARPERDB_URL);
+console.log(process.env.HARPERDB_URL); 
 const express = require('express');
 const app = express();
 const http = require('http');
 const cors = require('cors');
-const { Server } = require('socket.io');
+const { Server } = require('socket.io'); 
 const harperSaveMessage = require('./services/harper-save-message');
-const harperGetMessages = require('./services/harper-get-messages');
+const harperGetMessages = require('./services/harper-get-messages'); 
 const leaveRoom = require('./utils/leave-room');
-
-
 const PORT = process.env.port || 4000
-app.use(cors());
+app.use(cors()); 
 
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  pingTimeout: 60000,
-  maxHttpBufferSize: 1e8,
   cors: {
-    origin: 'https://marcksite.netlify.app/',
+    origin:'https://marcksite.netlify.app/',
     methods: ['GET', 'POST'],
   },
 });
@@ -75,7 +71,7 @@ io.on('connection', (socket) => {
   });
   socket.on('send_message', (data) => {
     const { message, username, room, __createdtime__ } = data;
-    io.in(room).emit('receive_message', data);
+    io.in(room).emit('receive_message', data); 
     harperSaveMessage(message, username, room, __createdtime__)
       .then((response) => console.log(response))
       .catch((err) => console.log(err));
@@ -94,12 +90,7 @@ io.on('connection', (socket) => {
 });
 
 app.get('/', (req, res) => {
-  console.log("Has entered")
-
   res.send('Hello world');
-
 });
 
-app.listen(PORT, () => {
-  console.log(PORT)
-})
+server.listen(PORT, () =>  console.log('Server is running on port 4000'))
