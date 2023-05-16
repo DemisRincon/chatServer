@@ -93,8 +93,6 @@ const io = new Server(server, {
   cors: {
     origin: "https://marcksite.netlify.app/",
     methods: ['GET', 'POST'],
-    allowedHeaders: ["Access-Control-Allow-Origin"],
-    credentials: true
   },
 });
 
