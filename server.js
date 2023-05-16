@@ -98,6 +98,7 @@ app.get('/', (req, res) => {
 
 });
 
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(PORT)
+server.listen(PORT, "0.0.0.0", err => {
+  // error checking
+  err ? console.error(err) : console.log(`listening on port ${PORT}`)
 })
