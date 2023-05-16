@@ -89,11 +89,13 @@ app.use(cors());
 
 const server = http.createServer(app);
 
-const io = new Server(server,  {
-  allowRequest: (req, callback) => {
-    const noOriginHeader = req.headers.origin === undefined;
-    callback(null, noOriginHeader);
-  }
+const io = new Server(server, {
+  cors: {
+    origin: "https://marcksite.netlify.app/",
+    methods: ['GET', 'POST'],
+    allowedHeaders: ["Access-Control-Allow-Origin"],
+    credentials: true
+  },
 });
 
 const CHAT_BOT = 'ChatBot';
