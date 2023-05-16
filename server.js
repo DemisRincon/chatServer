@@ -171,7 +171,7 @@ app.get('/', (req, res) => {
 
 });
 
-server.listen(PORT, "0.0.0.0", err => {
+server.listen(PORT, err => {
   // error checking
   err ? console.error(err) : console.log(`listening on port ${PORT}`)
 })
