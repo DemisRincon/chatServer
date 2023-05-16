@@ -124,12 +124,10 @@ io.on('connection', (socket) => {
     chatRoomUsers = allUsers.filter((user) => user.room === room);
     socket.to(room).emit('chatroom_users', chatRoomUsers);
     socket.emit('chatroom_users', chatRoomUsers);
-    await harperGetMessages(room)
-      .then((last100Messages) => {
-
-        socket.emit('last_100_messages', last100Messages);
-      })
+    const messages = harperGetMessages(room)
       .catch((err) => console.log(err));
+    socket.emit('last_100_messages', messages);
+
   });
   socket.on('leave_room', (data) => {
     const { username, room } = data;
