@@ -5,8 +5,8 @@ const app = express();
 const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
-const harperSaveMessage = await require('./services/harper-save-message');
-const harperGetMessages = await require('./services/harper-get-messages');
+const harperSaveMessage = require('./services/harper-save-message');
+const harperGetMessages = require('./services/harper-get-messages');
 const leaveRoom = require('./utils/leave-room');
 
 
