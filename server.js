@@ -17,7 +17,6 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: 'https://marcksite.netlify.app/',
     methods: ['GET', 'POST'],
   },
 });
@@ -98,6 +97,6 @@ app.get('/', (req, res) => {
 
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(PORT)
 })
