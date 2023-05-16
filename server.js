@@ -91,7 +91,7 @@ io.on('connection', (socket) => {
   });
 });
 
-server.get('/', (req, res) => {
+app.get('/', (req, res) => {
   console.log("Has entered")
 
   res.send('Hello world');
