@@ -1,15 +1,17 @@
 require('dotenv').config();
-console.log(process.env.HARPERDB_URL); 
+console.log(process.env.HARPERDB_URL);
 const express = require('express');
 const app = express();
 const http = require('http');
 const cors = require('cors');
-const { Server } = require('socket.io'); 
+const { Server } = require('socket.io');
 const harperSaveMessage = require('./services/harper-save-message');
-const harperGetMessages = require('./services/harper-get-messages'); 
+const harperGetMessages = require('./services/harper-get-messages');
 const leaveRoom = require('./utils/leave-room');
 
-app.use(cors()); 
+
+const PORT = process.env.port || 4000
+app.use(cors());
 
 const server = http.createServer(app);
 
@@ -71,7 +73,7 @@ io.on('connection', (socket) => {
   });
   socket.on('send_message', (data) => {
     const { message, username, room, __createdtime__ } = data;
-    io.in(room).emit('receive_message', data); 
+    io.in(room).emit('receive_message', data);
     harperSaveMessage(message, username, room, __createdtime__)
       .then((response) => console.log(response))
       .catch((err) => console.log(err));
@@ -91,9 +93,9 @@ io.on('connection', (socket) => {
 
 app.get('/', (req, res) => {
   console.log("Has entered")
-  
+
   res.send('Hello world');
-  
+
 });
 
-server.listen(4000, () => 'Server is running on port 4000')
+server.listen(PORT, () => 'Server is running on port 4000')
