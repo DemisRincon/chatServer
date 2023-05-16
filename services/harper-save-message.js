@@ -28,15 +28,15 @@ function harperSaveMessage(message, username, room) {
     data: data,
   };
 
-  return new Promise((resolve, reject) => {
-    axios(config)
+  return async (resolve, reject) => {
+    await axios(config)
       .then(function (response) {
         resolve(JSON.stringify(response.data));
       })
       .catch(function (error) {
         reject(error);
       });
-  });
+  }
 }
 
 module.exports = harperSaveMessage;
