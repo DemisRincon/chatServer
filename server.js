@@ -29,7 +29,7 @@ let allUsers = [];
 io.on('connection', async (socket) => {
   console.log(`User connected ${socket.id}`);
 
-  socket.on('join_room', (data) => {
+  socket.on('join_room', async (data) => {
     const { username, room } = data;
     socket.join(room);
 
@@ -50,7 +50,7 @@ io.on('connection', async (socket) => {
     chatRoomUsers = allUsers.filter((user) => user.room === room);
     socket.to(room).emit('chatroom_users', chatRoomUsers);
     socket.emit('chatroom_users', chatRoomUsers);
-    harperGetMessages(room)
+    await harperGetMessages(room)
       .then((last100Messages) => {
 
         socket.emit('last_100_messages', last100Messages);
@@ -71,10 +71,10 @@ io.on('connection', async (socket) => {
     });
     console.log(`${username} has left the chat`);
   });
-  socket.on('send_message', (data) => {
+  socket.on('send_message', async (data) => {
     const { message, username, room, __createdtime__ } = data;
     io.in(room).emit('receive_message', data);
-    harperSaveMessage(message, username, room, __createdtime__)
+    await harperSaveMessage(message, username, room, __createdtime__)
       .then((response) => console.log(response))
       .catch((err) => console.log(err));
   });
