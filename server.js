@@ -16,6 +16,8 @@ app.use(cors());
 const server = http.createServer(app);
 
 const io = new Server(server, {
+  pingTimeout: 60000,
+  maxHttpBufferSize: 1e8,
   cors: {
     origin: 'https://marcksite.netlify.app/',
     methods: ['GET', 'POST'],
