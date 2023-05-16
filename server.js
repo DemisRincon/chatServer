@@ -5,83 +5,9 @@ const app = express();
 const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
-let axios = require('axios');
-
-function harperSaveMessage(message, username, room) {
-  const dbUrl = process.env.HARPERDB_URL;
-  const dbPw = process.env.HARPERDB_PW;
-  if (!dbUrl || !dbPw) return null;
-
-  var data = JSON.stringify({
-    operation: 'insert',
-    schema: 'realtime_chat_app',
-    table: 'messages',
-    records: [
-      {
-        message,
-        username,
-        room,
-      },
-    ],
-  });
-
-  var config = {
-    method: 'post',
-    url: dbUrl,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: dbPw,
-    },
-    data: data,
-  };
-
-  return new Promise((resolve, reject) => {
-    axios(config)
-      .then(function (response) {
-        resolve(JSON.stringify(response.data));
-      })
-      .catch(function (error) {
-        reject(error);
-      });
-  });
-}
-
-
-
-function harperGetMessages(room) {
-  const dbUrl = process.env.HARPERDB_URL;
-  const dbPw = process.env.HARPERDB_PW;
-  if (!dbUrl || !dbPw) return null;
-
-  let data = JSON.stringify({
-    operation: 'sql',
-    sql: `SELECT * FROM realtime_chat_app.messages WHERE room = '${room}' LIMIT 100`,
-  });
-
-  let config = {
-    method: 'post',
-    url: dbUrl,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: dbPw,
-    },
-    data: data,
-  };
-
-  return new Promise((resolve, reject) => {
-    axios(config)
-      .then(function (response) {
-        resolve(JSON.stringify(response.data));
-      })
-      .catch(function (error) {
-        reject(error);
-      });
-  });
-}
-
-function leaveRoom(userID, chatRoomUsers) {
-  return chatRoomUsers.filter((user) => user.id != userID);
-}
+const harperSaveMessage = require('./services/harper-save-message');
+const harperGetMessages = require('./services/harper-get-messages');
+const leaveRoom = require('./utils/leave-room');
 
 
 const PORT = process.env.port || 4000
@@ -103,7 +29,7 @@ let allUsers = [];
 io.on('connection', (socket) => {
   console.log(`User connected ${socket.id}`);
 
-  socket.on('join_room', async (data) => {
+  socket.on('join_room', (data) => {
     const { username, room } = data;
     socket.join(room);
 
@@ -124,10 +50,12 @@ io.on('connection', (socket) => {
     chatRoomUsers = allUsers.filter((user) => user.room === room);
     socket.to(room).emit('chatroom_users', chatRoomUsers);
     socket.emit('chatroom_users', chatRoomUsers);
-    const messages = harperGetMessages(room)
-      .catch((err) => console.log(err));
-    socket.emit('last_100_messages', messages);
+    harperGetMessages(room)
+      .then((last100Messages) => {
 
+        socket.emit('last_100_messages', last100Messages);
+      })
+      .catch((err) => console.log(err));
   });
   socket.on('leave_room', (data) => {
     const { username, room } = data;
@@ -147,6 +75,7 @@ io.on('connection', (socket) => {
     const { message, username, room, __createdtime__ } = data;
     io.in(room).emit('receive_message', data);
     harperSaveMessage(message, username, room, __createdtime__)
+      .then((response) => console.log(response))
       .catch((err) => console.log(err));
   });
   socket.on('disconnect', () => {
@@ -169,7 +98,7 @@ app.get('/', (req, res) => {
 
 });
 
-server.listen(PORT, err => {
+server.listen(PORT, "0.0.0.0", err => {
   // error checking
   err ? console.error(err) : console.log(`listening on port ${PORT}`)
 })
