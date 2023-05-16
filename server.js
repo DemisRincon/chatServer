@@ -1,12 +1,10 @@
 require('dotenv').config();
 console.log(process.env.HARPERDB_URL);
 const express = require('express');
-
+const app = express();
 const http = require('http');
 const cors = require('cors');
-const app = express();
-const server = http.createServer(app);
-var io = require('socket.io')(server);
+const { Server } = require('socket.io');
 const harperSaveMessage = require('./services/harper-save-message');
 const harperGetMessages = require('./services/harper-get-messages');
 const leaveRoom = require('./utils/leave-room');
@@ -15,15 +13,23 @@ const leaveRoom = require('./utils/leave-room');
 const PORT = process.env.port || 4000
 app.use(cors());
 
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: 'https://marcksite.netlify.app/',
+    methods: ['GET', 'POST'],
+  },
+});
 
 const CHAT_BOT = 'ChatBot';
 
 let chatRoom = '';
 let allUsers = [];
-io.on('connection', async (socket) => {
+io.on('connection', (socket) => {
   console.log(`User connected ${socket.id}`);
 
-  socket.on('join_room', async (data) => {
+  socket.on('join_room', (data) => {
     const { username, room } = data;
     socket.join(room);
 
@@ -44,7 +50,7 @@ io.on('connection', async (socket) => {
     chatRoomUsers = allUsers.filter((user) => user.room === room);
     socket.to(room).emit('chatroom_users', chatRoomUsers);
     socket.emit('chatroom_users', chatRoomUsers);
-    await harperGetMessages(room)
+    harperGetMessages(room)
       .then((last100Messages) => {
 
         socket.emit('last_100_messages', last100Messages);
@@ -65,10 +71,10 @@ io.on('connection', async (socket) => {
     });
     console.log(`${username} has left the chat`);
   });
-  socket.on('send_message', async (data) => {
+  socket.on('send_message', (data) => {
     const { message, username, room, __createdtime__ } = data;
     io.in(room).emit('receive_message', data);
-    await harperSaveMessage(message, username, room, __createdtime__)
+    harperSaveMessage(message, username, room, __createdtime__)
       .then((response) => console.log(response))
       .catch((err) => console.log(err));
   });
@@ -92,7 +98,6 @@ app.get('/', (req, res) => {
 
 });
 
-server.listen(PORT, "0.0.0.0", err => {
-  // error checking
-  err ? console.error(err) : console.log(`listening on port ${PORT}`)
+app.listen(PORT, () => {
+  console.log(PORT)
 })
