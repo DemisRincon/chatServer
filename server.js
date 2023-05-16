@@ -16,14 +16,6 @@ const PORT = process.env.port || 4000
 app.use(cors());
 
 
-
-const io = new Server(server, {
-  cors: {
-    origin: "https://marcksite.netlify.app/",
-    methods: ['GET', 'POST'],
-  },
-});
-
 const CHAT_BOT = 'ChatBot';
 
 let chatRoom = '';
