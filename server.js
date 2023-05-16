@@ -90,7 +90,7 @@ io.on('connection', (socket) => {
   });
 });
 
-app.get('/', (req, res) => {
+server.get('/', (req, res) => {
   console.log("Has entered")
 
   res.send('Hello world');
