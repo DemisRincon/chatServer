@@ -98,4 +98,6 @@ app.get('/', (req, res) => {
 
 });
 
-server.listen(PORT, () => 'Server is running on port 4000')
+app.listen(PORT, () => {
+  console.log(PORT)
+})
