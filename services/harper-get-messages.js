@@ -21,15 +21,15 @@ function harperGetMessages(room) {
     data: data,
   };
 
-  return async (resolve, reject) => {
-    await axios(config)
+  return new Promise((resolve, reject) => {
+    axios(config)
       .then(function (response) {
         resolve(JSON.stringify(response.data));
       })
       .catch(function (error) {
         reject(error);
       });
-  }
+  });
 }
 
 module.exports = harperGetMessages;

@@ -5,8 +5,8 @@ const app = express();
 const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
-const harperSaveMessage = require('./services/harper-save-message');
-const harperGetMessages = require('./services/harper-get-messages');
+const harperSaveMessage = await require('./services/harper-save-message');
+const harperGetMessages = await require('./services/harper-get-messages');
 const leaveRoom = require('./utils/leave-room');
 
 
@@ -26,7 +26,7 @@ const CHAT_BOT = 'ChatBot';
 
 let chatRoom = '';
 let allUsers = [];
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
   console.log(`User connected ${socket.id}`);
 
   socket.on('join_room', (data) => {
