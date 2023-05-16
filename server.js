@@ -1,10 +1,12 @@
 require('dotenv').config();
 console.log(process.env.HARPERDB_URL);
 const express = require('express');
-const app = express();
+
 const http = require('http');
 const cors = require('cors');
-const { Server } = require('socket.io');
+const app = express();
+const server = http.createServer(app);
+var io = require('socket.io')(server);
 const harperSaveMessage = require('./services/harper-save-message');
 const harperGetMessages = require('./services/harper-get-messages');
 const leaveRoom = require('./utils/leave-room');
@@ -13,7 +15,7 @@ const leaveRoom = require('./utils/leave-room');
 const PORT = process.env.port || 4000
 app.use(cors());
 
-const server = http.createServer(app);
+
 
 const io = new Server(server, {
   cors: {
